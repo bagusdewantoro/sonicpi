@@ -2,7 +2,7 @@ use_bpm 110
 
 print sample_duration :loop_amen
 
-define :nd do |n, t, d|
+define :nd do |n=:e5, t, d|
   use_synth :dpulse
   play n, attack: 0.3, attack_level: 1, decay: d, decay_level: 4, release: 0
   sleep t
@@ -15,15 +15,15 @@ end
 
 
 define :nada do
-  nd :e5, 0.75, 0.2
+  nd 0.75, 0.2
   nd :g5, 0.75, 0.05
   nd :c5, 0.75, 0.2
-  nd :e5, 0.75, 0.05
+  nd 0.75, 0.05
   nd :a4, 0.75, 0.2
   nd :c5, 0.75, 0.05
   nd :g4, 0.75, 0.2
   nd :a4, 0.75, 0.05
-  nd :e4, 0.75, 0.2
+  nd 0.75, 0.2
   nd :g4, 1.25, 0.05
 end
 
