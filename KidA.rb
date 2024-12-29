@@ -6,7 +6,7 @@
 define :rhodes1 do |note|
   with_fx :compressor do
     with_fx :flanger, phase_offset: 0.3, mix: 0.01 do
-      synth :sine, note: note, attack: 0.1, decay: 0.5, sustain_level: 0.35, release: 0.8, amp: 0.3
+      synth :sine, note: note, attack: 0.1, decay: 0.5, sustain_level: 0.35, release: 0.8, amp: 0.45
       synth :pretty_bell, note: note, amp: 0.02
     end
   end
@@ -30,8 +30,8 @@ end
 pianoNote1 = [
   :bf4, [:d5, :f5, :g5], [:a4, :f5], [:f5, :d6],
   [:a5, :bf5], [:c5, :d5, :bf5], [:f4, :a4, :a5], [:a5, :f6],
-  [:e4, :g4], [:g5, :e6], [:g4, :bf4], [:a5, :bf6],
-  [:f4, :a4], [:g5, :c6], [:e4, :g4], [:a5, :d6]
+  [:e5, :g5], [:g5, :e6], [:g5, :bf5], [:a5, :bf6],
+  [:f5, :a5], [:g5, :c6], [:e4, :g4], [:a5, :d6]
 ].ring
 
 pianoNote2 = [
@@ -62,47 +62,76 @@ drumTomSleep = [
 
 use_bpm 110
 
-live_loop :beat do
-  16.times do
-    play 1, amp: 0
-    sleep 1
+##| Helicopter Sounds
+with_fx :echo, phase: 0.2, mix: 1 do
+  live_loop :helicopter do
+    sample :bd_pure, amp: 0.2, rate: 7
+    sleep 0.3
   end
 end
 
 
-live_loop :pianoIntro do
-  piano1 pianoNote2.tick(:one)
-  rhodes1 pianoNote1.tick(:two)
-  sleep 1
-end
+##| ##| Bell Sounds
+##| 1.times do
+##|   ##| Create a range for increasing and then decreasing amplitude
+##|   amp_values = (line 0.02, 0.6, steps: 10) + (line 0.6, 0.5, steps: 2)
 
-live_loop :bassIntro do
-  marimba bassNote1.tick(:three)
-  sleep 0.5
-end
-
-live_loop :bassDrum do
-  sample :bd_ada, amp: rrand(0.7, 1) , release: 0
-  sleep 0.5
-end
-
-
-live_loop :tomDrum do
-  sample :bd_haus, rate: 1.5 , amp: rrand(1.0, 1.2), lpf: rrand(65, 75)
-  sleep drumTomSleep.tick(:four)
-end
+##|   with_fx :flanger, phase_offset: 0.3, mix: 0.2 do
+##|     amp_values.each do |amp|
+##|       synth :sine, note: :d6, amp: amp
+##|       sleep 1
+##|     end
+##|   end
+##| end
 
 
 
+##| Songs
 
-##| Sample Test
-live_loop :testSample do
-  ##| sample :bd_ada
-  ##| sample :bd_sone
-  ##| sample :bd_haus
-  ##| sample :bd_zome
-  sleep 2
-end
+##| Intro
+
+##| live_loop :beat do
+##|   16.times do
+##|     play 1, amp: 0
+##|     sleep 1
+##|   end
+##| end
+
+##| live_loop :pianoIntro do
+##|   piano1 pianoNote2.tick(:one)
+##|   rhodes1 pianoNote1.tick(:two)
+##|   sleep 1
+##| end
+
+##| live_loop :bassIntro do
+##|   marimba bassNote1.tick(:three)
+##|   sleep 0.5
+##| end
+
+##| live_loop :bassDrum do
+##|   sample :bd_ada, amp: rrand(0.7, 1) , release: 0
+##|   sleep 0.5
+##| end
+
+##| live_loop :tomDrum do
+##|   sample :bd_haus, rate: 1.5 , amp: rrand(1.0, 1.2), lpf: rrand(65, 75)
+##|   sleep drumTomSleep.tick(:four)
+##| end
+
+
+
+
+##| ================ TEST ===========================
+
+
+##| ##| Sample Test
+##| with_fx :tremolo, phase: 0.2, mix: 0.5 do
+##|   live_loop :testSample, rate: -1 do
+##|     ##| sample :misc_cineboom
+##|     rhodes1 90
+##|     sleep 1
+##|   end
+##| end
 
 ##| ##| Syth Test
 ##| live_loop :testSynth do
