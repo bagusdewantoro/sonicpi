@@ -6,7 +6,7 @@
 define :rhodes1 do |note|
   with_fx :compressor do
     with_fx :flanger, phase_offset: 0.3, mix: 0.01 do
-      synth :sine, note: note, attack: 0.1, decay: 0.5, sustain_level: 0.35, release: 0.8, amp: 0.5
+      synth :sine, note: note, attack: 0.1, decay: 0.5, sustain_level: 0.35, release: 0.8, amp: 0.3
       synth :pretty_bell, note: note, amp: 0.02
     end
   end
@@ -14,13 +14,13 @@ end
 
 define :piano1 do |note|
   with_fx :reverb do
-    synth :beep, note: note, attack: 0.01, decay: 0.5, sustain_level: 0.5, release: 1.4, amp: 0.9
+    synth :beep, note: note, attack: 0.01, decay: 0.5, sustain_level: 0.5, release: 1.4, amp: 0.7
   end
 end
 
-define :bass1 do |note|
-  with_fx :reverb do
-    synth :beep, note: note, attack: 0, decay: 0.5, sustain_level: 0.5, release: 2, amp: 3
+define :marimba do |note|
+  with_fx :echo, phase: 0.5, mix: 0.5, pre_amp: 1.0, release: 4 do
+    synth :beep, note: note, attack: 0, decay: 0.5, sustain_level: 0.5, release: 1, amp: 1.2
   end
 end
 
@@ -49,6 +49,13 @@ bassNote1 = [
 ].ring
 
 
+drumTomSleep = [
+  0.75, 0.75, 1, 0.75, 2.25, 0.25, 0.5, 1.5, 0.75, # 8.5 beat
+  0.75, 0.75, (2.to_f/3), (4.to_f/3), 1.75, 0.25, (2.to_f/3), (2.to_f/3), (2.to_f/3), # 7.5 beat
+].ring
+
+
+
 
 
 ##| =========== LOOP ===========
@@ -69,14 +76,39 @@ live_loop :pianoIntro do
   sleep 1
 end
 
-with_fx :nrbpf, mix: 0.5, res: 0.5, pre_amp: 1 do
-  live_loop :bassIntro, sync: :beat do
-    bass1 bassNote1.tick(:three)
-    sleep 0.5
-  end
+live_loop :bassIntro do
+  marimba bassNote1.tick(:three)
+  sleep 0.5
+end
+
+live_loop :bassDrum do
+  sample :bd_ada, amp: rrand(0.7, 1) , release: 0
+  sleep 0.5
+end
+
+
+live_loop :tomDrum do
+  sample :bd_haus, rate: 1.5 , amp: rrand(1.0, 1.2), lpf: rrand(65, 75)
+  sleep drumTomSleep.tick(:four)
 end
 
 
 
+
+##| Sample Test
+live_loop :testSample do
+  ##| sample :bd_ada
+  ##| sample :bd_sone
+  ##| sample :bd_haus
+  ##| sample :bd_zome
+  sleep 2
+end
+
+##| ##| Syth Test
+##| live_loop :testSynth do
+##|   use_synth :tri
+##|   play :f3
+##|   sleep 1
+##| end
 
 
