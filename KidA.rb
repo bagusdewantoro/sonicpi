@@ -2,9 +2,15 @@
 
 
 # Change value to "1" to activate
-amp_piano = 0
-amp_bass_drum = 0
-amp_bell = 1
+
+amp_bell = 0
+
+if amp_bell == 0; amp_piano = 1
+else amp_piano = 0
+end
+
+amp_bass_drum = 1
+
 
 
 
@@ -31,6 +37,18 @@ define :marimba do |note|
   end
 end
 
+define :thom do |n=60, a=1, s=1|
+  with_fx :gverb, mix: 1 do
+    with_fx :bpf, mix: 0.5 do
+      synth :saw, note: n, attack: 0.5*s, release: 1.2*s, amp: 0.25*a
+      synth :tri, note: n, attack: 0.3*s, release: 1.1*s, amp: 0.6*a
+      ##| synth :beep, note: n, attack: 0.35*s, release: 1.01*s, amp: 1.5*a
+    end
+  end
+  sleep s
+end
+
+
 
 ##| =========== NOTES ===========
 
@@ -55,7 +73,6 @@ bassNote1 = [
   :r, :r, :r, :r, :r, :r, :r, :r,
 ].ring
 
-
 drumTomSleep = [
   1, 1, 0.5, 0.75, 0.25, 0.5,        1.25, 0.25, 0.5, 0.5, 0.75, 0.25, 0.5,       # 8 beat
   0.5, 0.25, 0.5, 0.25, 0.5,         1.75, 0.25, (4.to_f/6), (4.to_f/6), (1.to_f/6), (3.to_f/6), # 8 beat
@@ -64,6 +81,20 @@ drumTomSleep = [
 ].ring
 
 
+thomNote = [
+  :c4, :c4, :a3, :d4, :g4, :r,
+  :bf3, :bf3, :a3, :bf3, :c4, :c4,
+].ring
+
+thomAmp = [
+  1, 0.75, 0.3, 0.65, 0.35,
+  0.4, 0.75, 0.45, 0.6, 0.5,
+].ring
+
+thomSleep = [
+  1.25, 0.9, 3.85, 1.8, 5, 4,
+  1.15, 0.85, 1, 1, 1.2, 4.8
+].ring
 
 
 
@@ -72,6 +103,7 @@ drumTomSleep = [
 
 
 use_bpm 110
+
 
 in_thread(name: :Helicopter) do
   1.times do
@@ -150,7 +182,17 @@ live_loop :tomDrum do
   sleep drumTomSleep.tick(:four)
 end
 
+live_loop :metronome do
+  ##| synth :beep, note: 67
+  sleep 4
+end
 
+in_thread(name: :thomSing) do
+  sync :metronome
+  thomNote.length().times do
+    thom thomNote.tick(:tN), thomAmp.tick(:tA), thomSleep.tick(:tS)
+  end
+end
 
 
 
