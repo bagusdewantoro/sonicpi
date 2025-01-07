@@ -19,7 +19,7 @@ amp_bass_drum = master_volume * 1
 
 amp_heli = master_volume * 1
 
-amp_thom = master_volume * 0.8
+amp_thom = master_volume * 1.2
 
 
 
@@ -41,25 +41,28 @@ define :rhodes1 do |noteRhodes, notePiano, slp = 1|
 end
 
 
-define :marimba do |note|
+define :bass do |note|
   with_fx :compressor do
-    with_fx :echo, phase: 0.5, mix: 0.5, pre_amp: 2.0, release: 7 do
-      synth :beep, note: note, attack: 0, decay: 0.5, sustain_level: 1, release: 1, amp: (1.5*amp_bass_drum)
+    with_fx :echo, phase: 0.5, mix: 0.22, pre_amp: 2.0, release: 7 do
+      with_fx  :eq, low: 0.8, mid: 0.5, mid_q: 0.7 do
+        synth :chipbass, note: note, release: 1, amp: (1*amp_bass_drum)
+      end
     end
   end
   sleep 0.5
 end
 
 define :drumBass do |slp1=1, slp2=1|
-  sample :bd_ada, amp: (0.7*amp_bass_drum) , release: 0
+  sample :bd_ada, amp: (1.2*amp_bass_drum), release: 0
+  sample :bd_sone, amp: (0.7*amp_bass_drum) , rate: 0.8 , release: 0
   sleep slp1
-  sample :bd_ada, amp: (0.7*amp_bass_drum) , release: 0
-  sample :bd_sone, amp: (0.5*amp_bass_drum) , release: 0
+  sample :bd_ada, amp: (1.2*amp_bass_drum), release: 0
+  sample :bd_sone, amp: (1*amp_bass_drum) , rate: 1.5 , release: 0
   sleep slp2
 end
 
 define :drumTom do |slp=1|
-  sample :bd_haus, rate: 1.5 , amp: rrand((1.0*amp_bass_drum), (1.2*amp_bass_drum)), lpf: rrand(65, 75)
+  sample :bd_haus, rate: 2 , amp: 1.2*amp_bass_drum, lpf: 100
   sleep slp
 end
 
@@ -68,7 +71,6 @@ define :thom do |n=60, a=1, s=1|
     with_fx :bpf, mix: 0.5 do
       synth :saw, note: n, attack: 0.4*s, release: 0.7*s, amp: 0.25*a*amp_thom
       synth :tri, note: n, attack: 0.4*s, release: 1.0*s, amp: 0.45*a*amp_thom
-      ##| synth :beep, note: n, attack: 0.35*s, release: 1.01*s, amp: 1.5*a
     end
   end
   sleep s
@@ -109,10 +111,8 @@ bassDrumSleep = [
 ].ring
 
 drumTomSleep = [
-  1, 1, 0.5, 0.75, 0.25, 0.5,        1.25, 0.25, 0.5, 0.5, 0.75, 0.25, 0.5,       # 8 beat
-  0.5, 0.25, 0.5, 0.25, 0.5,         1.75, 0.25, (4.to_f/6), (4.to_f/6), (1.to_f/6), (3.to_f/6), # 8 beat
-  1, 1, 0.5, 0.75, 0.25, 0.5,        1.25, 0.25, 0.5, 0.5, 0.75, 0.25, 0.5,       # 8 beat
-  (2.to_f/3), (2.to_f/3), (2.to_f/3),   1.75, 0.25, (4.to_f/6), (4.to_f/6), (2.to_f/6), # 7.666 beat
+  1, 1, 0.5, 0.75, 0.25, 0.5,             1.5, 0.5, 0.5, 0.75, 0.25, 0.5,       # 8 beat
+  1, 1, 0.5, 0.75, 0.25, 0.5,          1.75, 0.25, (4.to_f/6), (4.to_f/6), (2.to_f/6), # 7.666 beat
 ].ring
 
 thomNote = [
@@ -121,8 +121,8 @@ thomNote = [
 ].ring
 
 thomAmp = [
-  1, 0.75, 0.3, 0.65, 0.35,
-  0.4, 0.75, 0.35, 0.5, 0.3,
+  1, 0.8, 0.8, 0.8, 0.65,
+  1, 0.8, 0.8, 0.8, 0.75,
 ].ring
 
 thomSleep = [
@@ -203,7 +203,7 @@ end
 in_thread(name: :bellEnd) do
   stop
   sync :metronome
-  end_values = (line 0.5, 2, steps: 3)
+  end_values = (line 2, 4, steps: 3)
   sleep 12.7
   end_values.each do |amp|
     sample :drum_cymbal_closed, amp: (amp*amp_bell), attack: 0, rate: -1
@@ -225,7 +225,7 @@ live_loop :bassIntro do
   ##| stop
   sync :metronome
   bassNote1.length().times do
-    marimba bassNote1.tick(:three)
+    bass bassNote1.tick(:three)
   end
 end
 
